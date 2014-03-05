@@ -1,42 +1,14 @@
 /* File BurstTrie.cpp
  * My C++ implementatio of a burst trie */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "record.h"
 #include <fstream>
 #include <list>
-#include <string>
 
-#define ALPHABET_SIZE (('z'-'a'+1)+2) // letters a throuh z plus empty string plus "'" plus
 
-/* Record class contains the target data
- * stored by the burst trie data structure */
-class Record{
-public:
-  explicit Record(const std::string& s=""):data(s){}
-  static int getIndex(const Record& r){
-    int index;
-    if(r.getData()[0]=='\0')
-      index=0;
-    else if(r.getData()[0]=='\'')
-      index=1;
-    else index= r.getData()[0]-'a'+2;
-    if(index<0 || index >=ALPHABET_SIZE) {
-      printf("Error: unknown character \"\%s\" in string.\n",r.getData().c_str());
-      exit(1); // error unknown character in string
-    }
-    return index;
-  }
+
   
-  size_t length() const {return data.length();}
-  std::string getData() const {return data;}
 
-  Record subRecord(size_t start,size_t len=std::string::npos) const{
-    return Record(data.substr(start,len));
-  }
-private:
-  std::string data;
-};
 
 /* maximum number of records that will be stored in one container
  * When the size exceeds this value the container is burst 
