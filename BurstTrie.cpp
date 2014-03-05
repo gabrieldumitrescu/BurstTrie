@@ -1,23 +1,9 @@
 /* File BurstTrie.cpp
  * My C++ implementatio of a burst trie */
 
-#include "record.h"
-#include <fstream>
-#include <list>
+#include "BurstTrie.h"
 
-
-
-  
-
-
-/* maximum number of records that will be stored in one container
- * When the size exceeds this value the container is burst 
- */
-#define CONTAINER_LIMIT 10
-
-class Node{
-public:
-  explicit Node(bool container=false)
+Node::Node(bool container)
     :isContainer(container){
     if(isContainer){
       records=new std::list<Record>;
@@ -27,20 +13,9 @@ public:
       records=NULL;
       children=new Node*[ALPHABET_SIZE];
     }
-  }
+}
 
-  /* Split a record in two parts.The first letter
-   * will be used to index into the children array of pointers
-   * and the rest of the Record will be added to the corresponding
-   * child.
-   * If the record has a length of 0 it will be inserted under the 
-   * first index (for the empty string).
-   * If the length is 1 it will be inserted under that letter and the 
-   * child container will add an empty string.
-   * If under the index there's no container/node a new one
-   * is created.
-   */
-  void splitRecord(const Record& rec){
+void Node::splitRecord(const Record& rec){
     int index=0;
     Record toInsertChild=Record("\0");
     if(rec.length()>=1){
@@ -51,9 +26,9 @@ public:
     if(children[index]==NULL) 
       children[index]=new Node(true); // create a new container under the index
     children[index]->addRecord(toInsertChild);
-  }
+}
   
-  void addRecord(const Record& rec){
+void Node::addRecord(const Record& rec){
     //printf("Adding record \"%s\"\n",rec.getData().c_str());
     if(isContainer){
       records->push_back(rec);
@@ -63,14 +38,9 @@ public:
     else{
       splitRecord(rec);
     }
-  }
+}
 
-  /* When a specific condition is met for example the container size 
-     exceeds a given value the container is transformed into a node 
-     and the records contained are copied into it's children minus the 
-     first character which is stored in the current node as the index
-     into the children array */
-  void burstContainer(){
+void Node::burstContainer(){
     if(isContainer){
       children=new Node*[ALPHABET_SIZE];
       for (int i=0; i<ALPHABET_SIZE; ++i)
@@ -87,7 +57,7 @@ public:
     }
   }
   
-  bool findRecord(const Record& rec) const{
+bool Node::findRecord(const Record& rec) const{
     if(isContainer){
       for (std::list<Record>::iterator it=records->begin();it!=records->end(); ++it){
 	if(rec.getData()==(*it).getData()){
@@ -109,9 +79,9 @@ public:
       if(children[childIndex]==NULL) return false;
       else return children[childIndex]->findRecord(toFindChild);
     }
-  }
+}
 
-  ~Node(){
+Node::~Node(){
     if(isContainer) {
       records->clear();
       delete records;
@@ -123,68 +93,18 @@ public:
       }
       delete[] children;
     }
-  }
-
-private:
-  bool isContainer;
-  Node** children;
-  std::list<Record> *records;
-  
-};
-
-class BurstTrie{
-public:
-  BurstTrie(){
-    root=new Node(true);
-  }
-  void addRecord(const Record& rec){
-    root->addRecord(rec);
-  }
-  bool findRecord(const Record& rec) const{
-    return root->findRecord(rec);
-  }
-  ~BurstTrie(){delete root;}
-private:
-  Node* root;
-};
-
-int main(int argc, char* argv[]){
-  /*Record x("garbage");
-  Record front("\0");
-  printf("Alphabet size:%d\n",ALPHABET_SIZE);
-  printf("Index of front:%d\n",Record::getIndex(front));
-  printf("Size of \"\\0\" string is:%lu\n",std::string("\0").length());
-  */
-  BurstTrie bt;
-  std::string fileName="eng_com.dic";
-  std::ifstream dictFile(fileName.c_str(),std::ifstream::in);
-  if(!dictFile.is_open()) {
-    printf("Could not open input file %s", fileName.c_str());
-    return 1;
-  }
-
-  int lineNo=0;
-  std::string line;
-  while(getline(dictFile,line)){
-    lineNo++;
-    //printf("Adding line no %d\n",lineNo);
-    bt.addRecord(Record(line));
-  }
-  printf("Added %d lines\n",lineNo);
-  dictFile.close();
-  fileName="toSearch.dic";
-  dictFile.open(fileName.c_str(),std::ifstream::in);
-  int found=0;
-  int notFound=0;
-  while(getline(dictFile,line)){
-    if(bt.findRecord(Record(line)))
-      //printf("Found record %s\n",line.c_str());
-      found++;
-    else
-      notFound++;
-    //printf("Record %s not found\n",line.c_str());
-  }
-  printf("Found %d records not found %d records.\n",found,notFound);
-  dictFile.close();
-  return 0;
 }
+
+BurstTrie::BurstTrie(){
+    root=new Node(true);
+}
+
+void BurstTrie::addRecord(const Record& rec){
+    root->addRecord(rec);
+}
+
+bool BurstTrie::findRecord(const Record& rec) const{
+    return root->findRecord(rec);
+}
+
+BurstTrie::~BurstTrie(){delete root;}

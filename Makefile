@@ -1,17 +1,18 @@
 CXX=g++
 CXXFLAGS=-g -Wall
 
-APP=BurstTrie
-SRC=BurstTrie.cpp record.cpp
+APP=testapp
+SRC=testapp.cpp BurstTrie.cpp record.cpp
 OBJS=$(SRC:.cpp=.o)
-HEADERS=record.h
+HEADERS=record.h BurstTrie.h
 
 all:$(APP)
 
 $(APP):$(HEADERS) $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@  $(OBJS)
 
-BurstTrie.o:BurstTrie.cpp
+testapp.o:record.h BurstTrie.h testapp.cpp
+BurstTrie.o:BurstTrie.h BurstTrie.cpp
 record.o:record.h record.cpp
 
 clean:
