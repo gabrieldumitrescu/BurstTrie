@@ -5,6 +5,7 @@
 #include "BurstTrie.h"
 #include <fstream>
 #include <unordered_map>
+#include <string.h>
 
 bool openInFile(const std::string &filename, std::ifstream &file){
   file.open(filename.c_str(),std::ifstream::in);
@@ -78,10 +79,16 @@ void testHashMap(const std::string& dictFileName, const std::string &searchFileN
 
 
 int main(int argc, char* argv[]){
+  if(argc<2){
+    printf("Usage: testapp -[hb]\n\t-h: test using hashmap\n\t-b: test using burst trie\n");
+    return 1;
+  }
   std::string dictFileName="eng_com.dic";
   std::string srchFileName="toSearch.dic";
-  //testBurstTrie(dictFileName,srchFileName);
-  testHashMap(dictFileName,srchFileName);
+  if(strcmp(argv[1],"-b")==0)
+    testBurstTrie(dictFileName,srchFileName);
+  if(strcmp(argv[1],"-h")==0)
+    testHashMap(dictFileName,srchFileName);
 
   return 0;
 }
