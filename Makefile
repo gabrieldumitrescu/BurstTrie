@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-std=c++0x -g -Wall -O0
+CXXFLAGS=-std=c++0x -g -Wall -O3
 
 APP=testapp
 SRC=testapp.cpp BurstTrie.cpp record.cpp
